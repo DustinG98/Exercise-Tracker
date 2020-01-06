@@ -55,14 +55,14 @@ router.route('/login').post(async (req, res) => {
 
     //Create & assign token
     const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)
-    res.header('auth-token', token).send(token)
+    res.header('auth-token', token).header('user_id', user._id).send('Logged In')
 })
 
 
 //VIEW USER BY ID
 router.route('/:id').get((req, res) => {
     User.findById(req.params.id)
-        .then(users => res.json(users))
+        .then(users => res.json(users[0]._id))
         .catch(err => res.status(400).json('Error: ' + err))
 })
 
