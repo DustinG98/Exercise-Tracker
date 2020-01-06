@@ -48,6 +48,25 @@ router.route('/:id/exercises/:exercise_id').delete((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err))
 })
 
+//UPDATE USER EXERCISE BY ID
+router.route('/:id/exercises/:exercise_id').post((req, res) => {
+    User.findById(req.params.id)
+        .then(user => {
+            user.exercises = user.exercises.map(exercise => {
+                if(String(exercise._id) === req.params.exercise_id) {
+                    exercise.description = req.body.description;
+                    exercise.duration = Number(req.body.duration);
+                    exercise.date = Date.parse(req.body.date);
+                    return exercise;
+                }
+                return exercise
+            })
+            user.save()
+            res.json('Exercise Updated!')
+        })
+        .catch(err => res.status(400).json('Error: ' + err))
+})
+
 //ADD EXERCISE TO USER
 router.route('/:id/exercises/add').post((req, res) => {
     const description = req.body.description;
