@@ -10,7 +10,19 @@ const userSchema = new Schema({
         required: true,
         unique: true,
         trim: true,
-        minlength: 3
+        min: 3
+    },
+    email: {
+        type: String,
+        required: true,
+        max: 255,
+        min: 6
+    },
+    hashPassword: {
+        type: String,
+        required: true,
+        max: 1024,
+        min: 6
     },
     exercises: [exerciseSchema],
 }, {
