@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
-const Login = () => {
+const Login = ({ setToken, setUserID }) => {
     const [user, setUser] = useState({
         email: "",
         password: ""
@@ -18,7 +18,10 @@ const Login = () => {
             "email": user.email,
             "password": user.password
         })
-            .then(res => console.log(res))
+            .then(res => {
+                setToken(res.headers["auth-token"]);
+                setUserID(res.headers["user_id"]);
+            })
             .catch(err => console.log(err))
     }
     return (
