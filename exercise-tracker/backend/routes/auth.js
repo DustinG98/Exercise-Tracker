@@ -1,11 +1,14 @@
 const router = require('express').Router();
-const User = require('../models/user.model')
+const exercises = require('./exercises')
 
+const User = require('../models/user.model')
 const jwt = require('jsonwebtoken')
 
 const bcrypt = require('bcryptjs')
 
 const verify = require('./verifyToken')
+
+
 
 //LIST ALL USERS
 router.route('/').get(verify, (req, res) => {
@@ -63,73 +66,9 @@ router.route('/:id').get((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err))
 })
 
-
-//GET USERS EXERCISES
-router.route('/:id/exercises/').get(verify, (req, res) => {
-    console.log(req.params)
-    User.findById(req.params.id)
-        .then(user => res.json(user.exercises))
-        .catch(err => res.status(400).json('Error: ' + err))
-})
-
-//GET USER EXERCISE BY ID
-router.route('/:id/exercises/:exercise_id').get(verify, (req, res) => {
-    console.log(req.params)
-    User.findById(req.params.id)
-        .then(user => res.json(user.exercises))
-        .catch(err => res.status(400).json('Error: ' + err))
-})
-
-//ADD EXERCISE TO USER
-router.route('/:id/exercises/add').post(verify, (req, res) => {
-    const description = req.body.description;
-    const duration = Number(req.body.duration);
-    const date = Date.parse(req.body.date);
-
-    const newExercise = { description, duration, date }
-
-    User.findById(req.params.id)
-        .then(user => {
-            user.exercises.push(newExercise)
-            user.save()
-            res.json('Exercise Added!')
-        })
-        .catch(err => res.status(400).json('Error: ' + err))
-})
-
-//DELETE USER EXERCISE BY ID
-router.route('/:id/exercises/:exercise_id').delete(verify, (req, res) => {
-    const exerciseId = req.params.exercise_id
-    console.log(exerciseId)
-    User.findById(req.params.id)
-        .then(user => {
-            user.exercises = user.exercises.filter(exercise => {
-                return String(exercise._id) !== exerciseId;
-            })
-            user.save()
-            res.send('Exercise Deleted')
-        })
-        .catch(err => res.status(400).json('Error: ' + err))
-})
-
-//UPDATE USER EXERCISE BY ID
-router.route('/:id/exercises/:exercise_id').post(verify, (req, res) => {
-    User.findById(req.params.id)
-        .then(user => {
-            user.exercises = user.exercises.map(exercise => {
-                if(String(exercise._id) === req.params.exercise_id) {
-                    exercise.description = req.body.description;
-                    exercise.duration = Number(req.body.duration);
-                    exercise.date = Date.parse(req.body.date);
-                    return exercise;
-                }
-                return exercise
-            })
-            user.save()
-            res.json('Exercise Updated!')
-        })
-        .catch(err => res.status(400).json('Error: ' + err))
-})
-
+router.use('/:id/exercises', function(req, res, next) {
+    req.id = req.params.id;
+    next();
+}, exercises)
 
 module.exports = router;
