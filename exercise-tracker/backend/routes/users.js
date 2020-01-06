@@ -18,9 +18,33 @@ router.route('/:id').get((req, res) => {
 
 
 //GET USERS EXERCISES
-router.route('/:id/exercises').get((req, res) => {
+router.route('/:id/exercises/').get((req, res) => {
+    console.log(req.params)
     User.findById(req.params.id)
         .then(user => res.json(user.exercises))
+        .catch(err => res.status(400).json('Error: ' + err))
+})
+
+//GET USER EXERCISE BY ID
+router.route('/:id/exercises/:exercise_id').get((req, res) => {
+    console.log(req.params)
+    User.findById(req.params.id)
+        .then(user => res.json(user.exercises))
+        .catch(err => res.status(400).json('Error: ' + err))
+})
+
+//DELETE USER EXERCISE BY ID
+router.route('/:id/exercises/:exercise_id').delete((req, res) => {
+    const exerciseId = req.params.exercise_id
+    console.log(exerciseId)
+    User.findById(req.params.id)
+        .then(user => {
+            user.exercises = user.exercises.filter(exercise => {
+                return String(exercise._id) !== exerciseId;
+            })
+            user.save()
+            res.send('Exercise Deleted')
+        })
         .catch(err => res.status(400).json('Error: ' + err))
 })
 
